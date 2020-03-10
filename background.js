@@ -1,15 +1,18 @@
 var version = chrome.runtime.getManifest().version;
 var mainVer = parseInt(version.split('.')[0]);
 var subVer = parseInt(version.split('.')[1]);
+var jsUrl;
 var isEnabled;
 update();
 var pwd;
+var msg;
 var xhr = new XMLHttpRequest();
 xhr.timeout = 30000;
+var isReady = true;
 xhr.onerror = function () {
+    isReady = false;
     if (localStorage.getItem('isVVClassAssistantEnabled') == 'true') {
-        localStorage.setItem('isVVClassAssistantEnabled', false);
-        update();
+        disable();
         alert('获取配置文件时出现错误！\n亮眼助手已停用！');
     } else {
         alert('获取配置文件时出现错误！');
@@ -19,10 +22,23 @@ xhr.onreadystatechange = function () {
     if (xhr.readyState == 4 && xhr.status == 200) {
         try {
             var conf = JSON.parse(xhr.responseText);
-            var latestMainVer = parseInt(conf.mainVer);
-            var latestSubVer = parseInt(conf.subVer);
-            var changelog = conf.changelog;
+            var latestMainVer = parseInt(conf.latest.mainVer);
+            var latestSubVer = parseInt(conf.latest.subVer);
+            var changelog = conf.latest.changelog;
+            var reg = new RegExp('^https://.+\.js$');
+            if (reg.test(conf.latest.jsUrl))
+                jsUrl = conf.latest.jsUrl;
+            else {
+                isReady = false;
+                if (localStorage.getItem('isVVClassAssistantEnabled') == 'true') {
+                    disable();
+                    alert('JavaScript 链接无效！\n亮眼助手已停用！');
+                } else {
+                    alert('JavaScript 链接无效！');
+                }
+            }
             pwd = conf.pwd;
+            msg = conf.msg;
         } catch (e) {
             alert('无法解析配置文件！');
         }
@@ -31,21 +47,22 @@ xhr.onreadystatechange = function () {
             chrome.tabs.create({ url: 'https://www.lanzous.com/b00zan3gd' });
         }
         if (localStorage.getItem('pwd') != pwd && localStorage.getItem('pwd') != null && localStorage.getItem('isVVClassAssistantEnabled') == 'true') {
-            localStorage.setItem('isVVClassAssistantEnabled', false);
-            update();
+            disable();
             alert('启用口令已更改！\n亮眼助手已停用！');
         }
         localStorage.setItem('pwd', pwd);
+        if (msg != undefined && msg != null&&msg!='')
+            alert(msg);
     }
 }
 xhr.open('GET', 'http://111.231.202.181/vaconfig.txt', true);
 xhr.send(null);
 chrome.webRequest.onBeforeRequest.addListener(
     function () {
-        if (isEnabled)
-            return { redirectUrl: "https://gitee.com/bianyukun1213/codes/tbc65z0uhve1w2fgpald359/raw?blob_name=latest.js" };
+        if (isEnabled && isReady)
+            return { redirectUrl: jsUrl };
     },
-    { urls: ["https://vvclass.shinevv.com/shinevv-vvclass-app.js?v=*"] },
+    { urls: ['https://vvclass.shinevv.com/shinevv-vvclass-app.js?v=*'] },
     ["blocking"]
 );
 function checkPwd(p) {
@@ -73,6 +90,9 @@ function update() {
 }
 function getVer() {
     return version;
+}
+function checkConf() {
+    return isReady;
 }
 /*
 * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message

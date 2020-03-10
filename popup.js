@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
         bg.disable();
         if (isCurrentTabVVClass) {
             alert('亮眼助手已停用！\n点击「确定」刷新以使更改生效。');
-            chrome.tabs.reload({ bypassCache: true });
+            chrome.tabs.reload();
         } else
             alert('亮眼助手已停用！\n若您已打开房间页面，请刷新以使更改生效。');
         updateStatus();
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (input == 'teacher' || input == 'tutor' || input == 'admin' || input == 'student' || input == 'visitor') {
             chrome.tabs.executeScript({ code: code.replace('ROLE', input) }, function () {
                 alert('角色已变更！\n点击「确定」刷新以使更改生效。');
-                chrome.tabs.reload({ bypassCache: true });
+                chrome.tabs.reload();
             });
             updateStatus();
 
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (reg.test(input)) {
             chrome.tabs.executeScript({ code: code.replace('ROOM', input) }, function () {
                 alert('房间已切换！\n点击「确定」刷新以使更改生效。');
-                chrome.tabs.reload({ bypassCache: true });
+                chrome.tabs.reload();
             });
             updateStatus();
         } else
@@ -68,7 +68,10 @@ function updateStatus() {
     else {
         document.getElementById('status').innerText = '状态：已停用';
         document.getElementById('disableBtn').disabled = 'disabled';
-        document.getElementById('enableBtn').removeAttribute('disabled');
+        if (bg.checkConf())
+            document.getElementById('enableBtn').removeAttribute('disabled');
+        else
+            document.getElementById('enableBtn').disabled = 'disabled';
     }
     chrome.tabs.query({
         currentWindow: true,
