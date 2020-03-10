@@ -51,7 +51,7 @@ xhr.onreadystatechange = function () {
             alert('启用口令已更改！\n亮眼助手已停用！');
         }
         localStorage.setItem('pwd', pwd);
-        if (msg != undefined && msg != null&&msg!='')
+        if (msg != undefined && msg != null && msg != '')
             alert(msg);
     }
 }
