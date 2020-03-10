@@ -27,6 +27,20 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('亮眼助手已停用！\n若您已打开房间页面，请刷新以使更改生效。');
         updateStatus();
     });
+    document.getElementById('nameChangeBtn').addEventListener('click', function () {
+        var input = prompt('请谨慎使用！\n昵称：');
+        var code = 'window.sessionStorage.setItem(\'vvroom.shinevv.nickName\',\'NAME\');';
+        if (input == null)
+            return;
+        if (input != '') {
+            chrome.tabs.executeScript({ code: code.replace('NAME', input) }, function () {
+                alert('昵称已更改！\n点击「确定」刷新以使更改生效。');
+                chrome.tabs.reload();
+            });
+            updateStatus();
+        } else
+            alert('无效的昵称！');
+    });
     document.getElementById('roleChangeBtn').addEventListener('click', function () {
         var input = prompt('请谨慎使用！\n角色代码（教师：teacher、助教：tutor、巡课人员或管理员：admin、互动学生：student、旁听学生：visitor）：');
         var code = 'window.sessionStorage.setItem(\'vvroom.shinevv.role\',\'ROLE\');';
@@ -34,11 +48,10 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         if (input == 'teacher' || input == 'tutor' || input == 'admin' || input == 'student' || input == 'visitor') {
             chrome.tabs.executeScript({ code: code.replace('ROLE', input) }, function () {
-                alert('角色已变更！\n点击「确定」刷新以使更改生效。');
+                alert('角色已更改！\n点击「确定」刷新以使更改生效。');
                 chrome.tabs.reload();
             });
             updateStatus();
-
         } else
             alert('无效的角色代码！');
     });
@@ -80,15 +93,18 @@ function updateStatus() {
         if (tab[0].url.startsWith('https://vvclass.shinevv.com/?s=#/room')) {
             isCurrentTabVVClass = true;
             if (bg.checkStatus()) {
+                document.getElementById('nameChangeBtn').removeAttribute('disabled');
                 document.getElementById('roleChangeBtn').removeAttribute('disabled');
                 document.getElementById('roomChangeBtn').removeAttribute('disabled');
             } else {
+                document.getElementById('nameChangeBtn').disabled = 'disabled';
                 document.getElementById('roleChangeBtn').disabled = 'disabled';
                 document.getElementById('roomChangeBtn').disabled = 'disabled';
             }
         }
         else {
             isCurrentTabVVClass = false;
+            document.getElementById('nameChangeBtn').disabled = 'disabled';
             document.getElementById('roleChangeBtn').disabled = 'disabled';
             document.getElementById('roomChangeBtn').disabled = 'disabled';
         }
