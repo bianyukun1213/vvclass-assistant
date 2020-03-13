@@ -2,6 +2,8 @@ var version = chrome.runtime.getManifest().version;
 var mainVer = parseInt(version.split('.')[0]);
 var subVer = parseInt(version.split('.')[1]);
 var jsUrl;
+var jsVer;
+var vvclassVer;
 var isEnabled;
 update();
 var pwd;
@@ -25,6 +27,8 @@ xhr.onreadystatechange = function () {
             var latestMainVer = parseInt(conf.latest.mainVer);
             var latestSubVer = parseInt(conf.latest.subVer);
             var changelog = conf.latest.changelog;
+            jsVer = conf.latest.jsVer;
+            vvclassVer = conf.latest.vvclassVer;
             var reg = new RegExp('^https://.+\.js$');
             if (reg.test(conf.latest.jsUrl))
                 jsUrl = conf.latest.jsUrl;
@@ -94,6 +98,12 @@ function getVer() {
 }
 function checkConf() {
     return isReady;
+}
+function getJSVer() {
+    return jsVer;
+}
+function getVVClassVer() {
+    return vvclassVer;
 }
 /*
 * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message

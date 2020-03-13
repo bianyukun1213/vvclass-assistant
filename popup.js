@@ -2,6 +2,10 @@ var bg = chrome.extension.getBackgroundPage();
 var isCurrentTabVVClass;
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('name').innerText = '亮眼助手 ' + bg.getVer();
+    var vvclassVer = bg.getVVClassVer();
+    var jsVer = bg.getJSVer();
+    if (vvclassVer != undefined && jsVer != undefined && vvclassVer != null && jsVer != null && vvclassVer != '' && jsVer != '')
+        document.getElementById('vvclassVer').innerText = '适用于亮眼课堂 ' + bg.getVVClassVer() + '（JavaScript 脚本 ' + bg.getJSVer() + '）。';
     updateStatus();
     document.getElementById('enableBtn').addEventListener('click', function () {
         var input = prompt('启用口令：');
