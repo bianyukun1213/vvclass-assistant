@@ -56,6 +56,7 @@ xhr.onreadystatechange = function () {
     }
 }
 xhr.open('GET', 'http://111.231.202.181/vaconfig.txt', true);
+xhr.setRequestHeader('Cache-Control', 'no-cache');
 xhr.send(null);
 chrome.webRequest.onBeforeRequest.addListener(
     function () {

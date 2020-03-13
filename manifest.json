@@ -1,7 +1,7 @@
 {
   "name": "亮眼助手",
   "description": "白内障看不清？",
-  "version": "1.2",
+  "version": "1.4",
   "manifest_version": 2,
   "icons": {
     "16": "icon_16.png",
