@@ -4,6 +4,7 @@ var subVer = parseInt(version.split('.')[1]);
 var jsUrl;
 var jsVer;
 var vvclassVer;
+var loginJS;
 var isEnabled;
 update();
 var pwd;
@@ -11,15 +12,7 @@ var msg;
 var xhr = new XMLHttpRequest();
 xhr.timeout = 30000;
 var isReady = true;
-xhr.onerror = function () {
-    isReady = false;
-    if (localStorage.getItem('isVVClassAssistantEnabled') == 'true') {
-        disable();
-        alert('获取配置文件时出现错误！\n亮眼助手已停用！');
-    } else {
-        alert('获取配置文件时出现错误！');
-    }
-};
+xhr.onerror = err;
 xhr.onreadystatechange = function () {
     if (xhr.readyState == 4 && xhr.status == 200) {
         try {
@@ -29,6 +22,7 @@ xhr.onreadystatechange = function () {
             var changelog = conf.latest.changelog;
             jsVer = conf.latest.jsVer;
             vvclassVer = conf.latest.vvclassVer;
+            loginJS = conf.loginJS;
             var reg = new RegExp('^https://.+\.js$');
             if (reg.test(conf.latest.jsUrl))
                 jsUrl = conf.latest.jsUrl;
@@ -44,7 +38,7 @@ xhr.onreadystatechange = function () {
             pwd = conf.pwd;
             msg = conf.msg;
         } catch (e) {
-            alert('无法解析配置文件！');
+            err();
         }
         if (latestMainVer > mainVer || (latestMainVer == mainVer && latestSubVer > subVer)) {
             alert('亮眼助手新版本：' + latestMainVer + '.' + latestSubVer + ' 已发布！\n更新内容：\n' + changelog + '\n点击「确定」访问下载页面。');
@@ -70,6 +64,14 @@ chrome.webRequest.onBeforeRequest.addListener(
     { urls: ['https://vvclass.shinevv.com/shinevv-vvclass-app.js?v=*'] },
     ["blocking"]
 );
+function err() {
+    isReady = false;
+    if (localStorage.getItem('isVVClassAssistantEnabled') == 'true') {
+        disable();
+        alert('获取配置文件时出现错误！\n亮眼助手已停用！');
+    } else
+        alert('获取配置文件时出现错误！');
+}
 function checkPwd(p) {
     if (hex_md5(p) == pwd && pwd != undefined)
         return true;

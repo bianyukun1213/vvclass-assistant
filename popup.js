@@ -74,6 +74,16 @@ document.addEventListener('DOMContentLoaded', function () {
         } else
             alert('无效的房间号！');
     });
+    document.getElementById('loginBtn').addEventListener('click', function () {
+        var code = bg.loginJS;
+        if (code != undefined)
+            chrome.tabs.executeScript({ code: code });
+        else
+            alert('强制登录代码无效！');
+    });
+    chrome.tabs.onUpdated.addListener(function () {
+        updateStatus();
+    });
 });
 function updateStatus() {
     if (bg.checkStatus()) {
@@ -81,7 +91,6 @@ function updateStatus() {
         document.getElementById('enableBtn').disabled = 'disabled';
         document.getElementById('disableBtn').removeAttribute('disabled');
     }
-
     else {
         document.getElementById('status').innerText = '状态：已停用';
         document.getElementById('disableBtn').disabled = 'disabled';
@@ -94,8 +103,19 @@ function updateStatus() {
         currentWindow: true,
         active: true
     }, function (tab) {
-        if (tab[0].url.startsWith('https://vvclass.shinevv.com/?s=#/room')) {
+        if (tab[0].url.startsWith('https://vvclass.shinevv.com/'))
             isCurrentTabVVClass = true;
+        else
+            isCurrentTabVVClass = false;
+        if (tab[0].url == 'https://vvclass.shinevv.com/#/') {
+            if (bg.checkStatus())
+                document.getElementById('loginBtn').removeAttribute('disabled');
+            else
+                document.getElementById('loginBtn').disabled = 'disabled';
+        }
+        else
+            document.getElementById('loginBtn').disabled = 'disabled';
+        if (tab[0].url.startsWith('https://vvclass.shinevv.com/?s=#/room')) {
             if (bg.checkStatus()) {
                 document.getElementById('nameChangeBtn').removeAttribute('disabled');
                 document.getElementById('roleChangeBtn').removeAttribute('disabled');
@@ -107,7 +127,6 @@ function updateStatus() {
             }
         }
         else {
-            isCurrentTabVVClass = false;
             document.getElementById('nameChangeBtn').disabled = 'disabled';
             document.getElementById('roleChangeBtn').disabled = 'disabled';
             document.getElementById('roomChangeBtn').disabled = 'disabled';
