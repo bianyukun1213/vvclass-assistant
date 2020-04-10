@@ -14,10 +14,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (bg.checkPwd(input)) {
             bg.enable();
             if (isCurrentTabVVClass) {
-                alert('亮眼助手已启用！\n点击「确定」刷新以使更改生效。');
                 chrome.tabs.reload({ 'bypassCache': true });
             } else
-                alert('亮眼助手已启用！\n若您已打开房间页面，请刷新以使更改生效。');
+                alert('亮眼助手已启用！\n请刷新课堂页面以使更改生效。');
             updateStatus();
         } else
             alert('口令错误！');
@@ -25,10 +24,9 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('disableBtn').addEventListener('click', function () {
         bg.disable();
         if (isCurrentTabVVClass) {
-            alert('亮眼助手已停用！\n点击「确定」刷新以使更改生效。');
             chrome.tabs.reload();
         } else
-            alert('亮眼助手已停用！\n若您已打开房间页面，请刷新以使更改生效。');
+            alert('亮眼助手已停用！\n请刷新课堂页面以使更改生效。');
         updateStatus();
     });
     document.getElementById('nameChangeBtn').addEventListener('click', function () {
@@ -38,7 +36,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         if (input != '') {
             chrome.tabs.executeScript({ code: code.replace('NAME', input) }, function () {
-                alert('昵称已更改！\n点击「确定」刷新以使更改生效。');
                 chrome.tabs.reload();
             });
             updateStatus();
@@ -52,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         if (input == 'teacher' || input == 'tutor' || input == 'admin' || input == 'student' || input == 'visitor') {
             chrome.tabs.executeScript({ code: code.replace('ROLE', input) }, function () {
-                alert('角色已更改！\n点击「确定」刷新以使更改生效。');
                 chrome.tabs.reload();
             });
             updateStatus();
@@ -67,7 +63,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         if (reg.test(input)) {
             chrome.tabs.executeScript({ code: code.replace('ROOM', input) }, function () {
-                alert('房间已切换！\n点击「确定」刷新以使更改生效。');
                 chrome.tabs.reload();
             });
             updateStatus();
