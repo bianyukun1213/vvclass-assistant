@@ -38,12 +38,11 @@ xhr.onreadystatechange = function () {
                         isReady = false;
                         alert('JavaScript 链接无效！\n亮眼助手已停用！');
                     }
-                } else {
+                } else
                     if (isReady) {
                         isReady = false;
                         alert('JavaScript 链接无效！');
                     }
-                }
             }
         } catch (e) {
             err();
@@ -89,15 +88,14 @@ function err() {
             alert('获取配置文件时出现错误！\n亮眼助手已停用！');
         }
 
-    } else {
+    } else
         if (isReady) {
             isReady = false;
             alert('获取配置文件时出现错误！\n亮眼助手已停用！');
         }
-    }
 }
 function checkPwd(p) {
-    if (hex_md5(p) == pwd && pwd != undefined)
+    if (pwd == hex_md5(p) && pwd != undefined)
         return true;
     else
         return false;
