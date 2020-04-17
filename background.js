@@ -11,7 +11,8 @@ var pwd;
 var msg;
 var xhr = new XMLHttpRequest();
 xhr.timeout = 30000;
-var isReady = true;
+var isReady = true;//这里也一定要先赋值为 true。
+var prevMsg;
 xhr.onerror = err;
 xhr.onreadystatechange = function () {
     if (xhr.readyState == 4 && xhr.status == 200) {
@@ -23,20 +24,27 @@ xhr.onreadystatechange = function () {
             jsVer = conf.latest.jsVer;
             vvclassVer = conf.latest.vvclassVer;
             loginJS = conf.loginJS;
-            var reg = new RegExp('^https://.+\.js$');
-            if (reg.test(conf.latest.jsUrl))
-                jsUrl = conf.latest.jsUrl;
-            else {
-                isReady = false;
-                if (localStorage.getItem('isVVClassAssistantEnabled') == 'true') {
-                    disable();
-                    alert('JavaScript 链接无效！\n亮眼助手已停用！');
-                } else {
-                    alert('JavaScript 链接无效！');
-                }
-            }
             pwd = conf.pwd;
             msg = conf.msg;
+            var reg = new RegExp('^https://.+\.js$');
+            if (reg.test(conf.latest.jsUrl)) {
+                jsUrl = conf.latest.jsUrl;
+                isReady = true;
+            }
+            else {
+                if (localStorage.getItem('isVVClassAssistantEnabled') == 'true') {
+                    disable();
+                    if (isReady) {
+                        isReady = false;
+                        alert('JavaScript 链接无效！\n亮眼助手已停用！');
+                    }
+                } else {
+                    if (isReady) {
+                        isReady = false;
+                        alert('JavaScript 链接无效！');
+                    }
+                }
+            }
         } catch (e) {
             err();
         }
@@ -49,13 +57,17 @@ xhr.onreadystatechange = function () {
             alert('启用口令已更改！\n亮眼助手已停用！');
         }
         localStorage.setItem('pwd', pwd);
-        if (msg != undefined && msg != null && msg != '')
+        if (msg != undefined && msg != null && msg != '' && msg != prevMsg && isReady) {
             alert(msg);
+            prevMsg = msg;
+        }
+        var views = chrome.extension.getViews({ type: 'popup' });
+        if (views.length > 0)
+            views[0].updateStatus();
     }
 }
-xhr.open('GET', 'http://111.231.202.181/vaconfig.txt', true);
-xhr.setRequestHeader('Cache-Control', 'no-cache');
-xhr.send(null);
+send();
+window.setInterval(send, 300000);
 chrome.webRequest.onBeforeRequest.addListener(
     function () {
         if (isEnabled && isReady)
@@ -64,13 +76,25 @@ chrome.webRequest.onBeforeRequest.addListener(
     { urls: ['https://vvclass.shinevv.com/shinevv-vvclass-app.js?v=*'] },
     ["blocking"]
 );
+function send() {
+    xhr.open('GET', 'http://111.231.202.181/vaconfig.txt', true);
+    xhr.setRequestHeader('Cache-Control', 'no-cache');
+    xhr.send(null);
+}
 function err() {
-    isReady = false;
     if (localStorage.getItem('isVVClassAssistantEnabled') == 'true') {
         disable();
-        alert('获取配置文件时出现错误！\n亮眼助手已停用！');
-    } else
-        alert('获取配置文件时出现错误！');
+        if (isReady) {
+            isReady = false;
+            alert('获取配置文件时出现错误！\n亮眼助手已停用！');
+        }
+
+    } else {
+        if (isReady) {
+            isReady = false;
+            alert('获取配置文件时出现错误！\n亮眼助手已停用！');
+        }
+    }
 }
 function checkPwd(p) {
     if (hex_md5(p) == pwd && pwd != undefined)
