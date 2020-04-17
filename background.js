@@ -36,12 +36,12 @@ xhr.onreadystatechange = function () {
                     disable();
                     if (isReady) {
                         isReady = false;
-                        alert('JavaScript 链接无效！\n亮眼助手已停用！');
+                        alert('JavaScript 脚本链接无效！\n亮眼助手已停用！');
                     }
                 } else
                     if (isReady) {
                         isReady = false;
-                        alert('JavaScript 链接无效！');
+                        alert('JavaScript 脚本链接无效！');
                     }
             }
         } catch (e) {
@@ -85,13 +85,13 @@ function err() {
         disable();
         if (isReady) {
             isReady = false;
-            alert('获取配置文件时出现错误！\n亮眼助手已停用！');
+            alert('读取配置文件时出现错误！\n亮眼助手已停用！');
         }
 
     } else
         if (isReady) {
             isReady = false;
-            alert('获取配置文件时出现错误！\n亮眼助手已停用！');
+            alert('读取配置文件时出现错误！\n亮眼助手已停用！');
         }
 }
 function checkPwd(p) {
