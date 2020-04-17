@@ -13,20 +13,14 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         if (bg.checkPwd(input)) {
             bg.enable();
-            if (isCurrentTabVVClass) {
-                chrome.tabs.reload({ 'bypassCache': true });
-            } else
-                alert('亮眼助手已启用！\n请刷新课堂页面以使更改生效。');
+            refresh();
             updateStatus();
         } else
             alert('口令错误！');
     });
     document.getElementById('disableBtn').addEventListener('click', function () {
         bg.disable();
-        if (isCurrentTabVVClass) {
-            chrome.tabs.reload();
-        } else
-            alert('亮眼助手已停用！\n请刷新课堂页面以使更改生效。');
+        refresh();
         updateStatus();
     });
     document.getElementById('nameChangeBtn').addEventListener('click', function () {
@@ -80,6 +74,14 @@ document.addEventListener('DOMContentLoaded', function () {
         updateStatus();
     });
 });
+function refresh() {
+    chrome.tabs.query({}, function (tabs) {
+        for (var i = 0; i < tabs.length; i++) {
+            if (tabs[i].url.startsWith('https://vvclass.shinevv.com/'))
+                chrome.tabs.reload(tabs[i].id);
+        }
+    });
+}
 function updateStatus() {
     if (bg.checkStatus()) {
         document.getElementById('status').innerText = '状态：已启用';
@@ -97,12 +99,12 @@ function updateStatus() {
     chrome.tabs.query({
         currentWindow: true,
         active: true
-    }, function (tab) {
-        if (tab[0].url.startsWith('https://vvclass.shinevv.com/'))
+    }, function (tabs) {
+        if (tabs[0].url.startsWith('https://vvclass.shinevv.com/'))
             isCurrentTabVVClass = true;
         else
             isCurrentTabVVClass = false;
-        if (tab[0].url == 'https://vvclass.shinevv.com/#/') {
+        if (tabs[0].url == 'https://vvclass.shinevv.com/#/') {
             if (bg.checkStatus())
                 document.getElementById('loginBtn').removeAttribute('disabled');
             else
@@ -110,7 +112,7 @@ function updateStatus() {
         }
         else
             document.getElementById('loginBtn').disabled = 'disabled';
-        if (tab[0].url.startsWith('https://vvclass.shinevv.com/?s=#/room')) {
+        if (tabs[0].url.startsWith('https://vvclass.shinevv.com/?s=#/room')) {
             if (bg.checkStatus()) {
                 document.getElementById('nameChangeBtn').removeAttribute('disabled');
                 document.getElementById('roleChangeBtn').removeAttribute('disabled');

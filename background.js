@@ -33,9 +33,9 @@ xhr.onreadystatechange = function () {
             }
             else {
                 if (localStorage.getItem('isVVClassAssistantEnabled') == 'true') {
-                    disable();
                     if (isReady) {
                         isReady = false;
+                        disable();
                         alert('JavaScript 脚本链接无效！\n亮眼助手已停用！');
                     }
                 } else
@@ -82,16 +82,16 @@ function send() {
 }
 function err() {
     if (localStorage.getItem('isVVClassAssistantEnabled') == 'true') {
-        disable();
         if (isReady) {
             isReady = false;
+            disable();
             alert('读取配置文件时出现错误！\n亮眼助手已停用！');
         }
 
     } else
         if (isReady) {
             isReady = false;
-            alert('读取配置文件时出现错误！\n亮眼助手已停用！');
+            alert('读取配置文件时出现错误！');
         }
 }
 function checkPwd(p) {
@@ -110,6 +110,7 @@ function enable() {
 function disable() {
     localStorage.setItem('isVVClassAssistantEnabled', false);
     update();
+    refresh();
 }
 function update() {
     if (localStorage.getItem('isVVClassAssistantEnabled') == 'true')
@@ -128,6 +129,14 @@ function getJSVer() {
 }
 function getVVClassVer() {
     return vvclassVer;
+}
+function refresh() {
+    chrome.tabs.query({}, function (tabs) {
+        for (var i = 0; i < tabs.length; i++) {
+            if (tabs[i].url.startsWith('https://vvclass.shinevv.com/'))
+                chrome.tabs.reload(tabs[i].id);
+        }
+    });
 }
 /*
 * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
