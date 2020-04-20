@@ -13,7 +13,8 @@ var xhr = new XMLHttpRequest();
 xhr.timeout = 30000;
 var isReady = true;//这里也一定要先赋值为 true。
 var prevMsg;
-var prevChangelog;
+var prevMainVer;
+var prevSubVer;
 xhr.onerror = err;
 xhr.onreadystatechange = function () {
     if (xhr.readyState == 4 && xhr.status == 200) {
@@ -48,7 +49,9 @@ xhr.onreadystatechange = function () {
         } catch (e) {
             err();
         }
-        if ((latestMainVer > mainVer || (latestMainVer == mainVer && latestSubVer > subVer)) && changelog != prevChangelog) {
+        if ((latestMainVer > mainVer || (latestMainVer == mainVer && latestSubVer > subVer)) && (latestMainVer != prevMainVer || latestSubVer != prevSubVer)) {
+            prevMainVer = latestMainVer;
+            prevSubVer = latestSubVer;
             alert('亮眼助手新版本：' + latestMainVer + '.' + latestSubVer + ' 已发布！\n更新内容：\n' + changelog + '\n点击「确定」访问下载页面。');
             chrome.tabs.create({ url: 'https://www.lanzous.com/b00zan3gd' });
         }
