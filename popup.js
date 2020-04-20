@@ -104,7 +104,7 @@ function updateStatus() {
             isCurrentTabVVClass = true;
         else
             isCurrentTabVVClass = false;
-        if (tabs[0].url == 'https://vvclass.shinevv.com/#/') {
+        if (tabs[0].url == 'https://vvclass.shinevv.com/#/' || tabs[0].url == 'https://vvclass.shinevv.com/?s=#/') {
             if (bg.checkStatus())
                 document.getElementById('loginBtn').removeAttribute('disabled');
             else
