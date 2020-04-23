@@ -1,5 +1,7 @@
 var bg = chrome.extension.getBackgroundPage();
 var isCurrentTabVVClass;
+var isCurrentTabLoginPage;
+var tabJustCreated;
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('name').innerText = '亮眼助手 ' + bg.getVer();
     var vvclassVer = bg.getVVClassVer();
@@ -64,14 +66,30 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('无效的房间号！');
     });
     document.getElementById('loginBtn').addEventListener('click', function () {
+        if (!isCurrentTabLoginPage) {
+            chrome.tabs.create({ active: false, url: 'https://vvclass.shinevv.com/#/' }, function (tab) {
+                tabJustCreated = tab.id;
+            });
+            return;
+        }
         var code = bg.loginJS;
         if (code != undefined)
             chrome.tabs.executeScript({ code: code });
         else
             alert('强制登录代码无效！');
     });
-    chrome.tabs.onUpdated.addListener(function () {
+    chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
         updateStatus();
+        if (changeInfo.status == 'complete' && tabId == tabJustCreated) {
+            var code = bg.loginJS;
+            if (code != undefined)
+                chrome.tabs.executeScript(tabJustCreated, { code: code }, function () {
+                    chrome.tabs.update(tabJustCreated, { active: true });
+                    tabJustCreated = undefined;
+                });
+            else
+                alert('强制登录代码无效！');
+        }
     });
 });
 function refresh() {
@@ -87,31 +105,28 @@ function updateStatus() {
         document.getElementById('status').innerText = '状态：已启用';
         document.getElementById('enableBtn').disabled = 'disabled';
         document.getElementById('disableBtn').removeAttribute('disabled');
+        document.getElementById('loginBtn').removeAttribute('disabled');
     }
     else {
         document.getElementById('status').innerText = '状态：已停用';
         document.getElementById('disableBtn').disabled = 'disabled';
+        document.getElementById('loginBtn').disabled = 'disabled';
         if (bg.checkConf())
             document.getElementById('enableBtn').removeAttribute('disabled');
+
         else
             document.getElementById('enableBtn').disabled = 'disabled';
     }
-    chrome.tabs.query({
-        currentWindow: true,
-        active: true
-    }, function (tabs) {
+    chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
         if (tabs[0].url.startsWith('https://vvclass.shinevv.com/'))
             isCurrentTabVVClass = true;
         else
             isCurrentTabVVClass = false;
         if (tabs[0].url == 'https://vvclass.shinevv.com/#/' || tabs[0].url == 'https://vvclass.shinevv.com/?s=#/') {
-            if (bg.checkStatus())
-                document.getElementById('loginBtn').removeAttribute('disabled');
-            else
-                document.getElementById('loginBtn').disabled = 'disabled';
+            isCurrentTabLoginPage = true;
         }
         else
-            document.getElementById('loginBtn').disabled = 'disabled';
+            isCurrentTabLoginPage = false;
         if (tabs[0].url.startsWith('https://vvclass.shinevv.com/?s=#/room')) {
             if (bg.checkStatus()) {
                 document.getElementById('nameChangeBtn').removeAttribute('disabled');
