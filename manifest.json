@@ -1,7 +1,7 @@
 {
   "name": "亮眼助手",
   "description": "白内障看不清？",
-  "version": "1.11",
+  "version": "1.12",
   "manifest_version": 2,
   "icons": {
     "16": "icon_16.png",
@@ -28,5 +28,6 @@
     "webRequestBlocking",
     "http://*/*",
     "https://*/*"
-  ]
+  ],
+  "homepage_url": "https://his2nd.life/posts/301f019c.html"
 }
