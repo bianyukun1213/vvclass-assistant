@@ -58,8 +58,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (input == null)
             return;
         if (reg.test(input)) {
-            chrome.tabs.executeScript({ code: code.replace('ROOM', input) }, function () {
-                chrome.tabs.reload();
+            chrome.tabs.update({ url: 'https://vvclass.shinevv.com/?s=#/room' }, function () {
+                chrome.tabs.executeScript({ code: code.replace('ROOM', input) }, function () {
+                    chrome.tabs.reload();
+                });
             });
             updateStatus();
         } else
